@@ -1,0 +1,8 @@
+#############################################
+GET http://localhost:4567/member/exercise
+  ?member_id=1
+  &exercise_id=53
+
+#############################################
+GET http://localhost:4567/member/resume
+  ?member_id=1
