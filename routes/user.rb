@@ -25,6 +25,7 @@ post '/user/validate' do
       }
       status = 200
     else
+      status = 404
       resp[:message] = 'Usuario no encontrado'
     end
   rescue Sequel::DatabaseError => e
@@ -64,8 +65,9 @@ post '/user/reset' do
       User[record[:user_id]].update(password: new_password)
       resp[:message] = 'Contraseña actualizada'
       status = 200
+    else
+      resp[:message] = 'Usuario no encontrado'
     end
-    puts record
   rescue Sequel::DatabaseError => e
     resp[:message] = 'Error al acceder a la base de datos'
     resp[:data] = e.message

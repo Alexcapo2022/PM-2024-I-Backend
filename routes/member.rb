@@ -23,8 +23,8 @@ get '/member/resume' do
     if record then
       resp[:message] = 'Lista de ejercicios'
       resp[:data] = {
-        exercises: record[:exercises],
-        body_parts: record[:body_parts_count],
+        exercises: record[:exercises], # int
+        body_parts: record[:body_parts_count], # int
       }
     else
       resp[:message] = 'Usuario aún no cuenta con ejercicios asignados'
@@ -69,6 +69,59 @@ get '/member/exercise' do
         reps: record[:reps], 
         video_url: record[:video_url], 
       }
+    else
+      resp[:message] = 'Usuario aún no tiene asignado ese ejercicio'
+    end
+    status = 200
+  rescue Sequel::DatabaseError => e
+    resp[:message] = 'Error al acceder a la base de datos'
+    resp[:data] = e.message
+  rescue StandardError => e
+    resp[:message] = 'Error no esperado'
+    resp[:data] = e.message
+  end
+  # response
+  status status
+  resp.to_json
+end
+
+get '/member/exercises' do
+  # params
+  status = 500
+  resp = {
+    :message => '',
+    :data => '',
+  }
+  member_id = params[:member_id]
+  body_part_id = params[:body_part_id]
+  # db access
+  begin
+    query = <<-STRING
+      SELECT E.id, E.name, E.image_url, E.video_url, E.description, E.body_part_id, EM.sets, EM.reps FROM exercises_members EM 
+      INNER JOIN exercises E ON E.id = EM.exercise_id 
+      INNER JOIN body_parts BP ON BP.id = E.body_part_id
+      WHERE member_id = #{member_id};
+    STRING
+    if body_part_id != nil then
+      query = query + ` AND body_part_id = #{body_part_id};`
+    end
+    rs = DB[query]
+    # puts query
+    if rs then
+      resp[:data] = []
+      rs.each do |row|
+        # Procesar cada fila del resultado y agregarla a resp[:data]
+        resp[:data] << {
+          id: row[:id],
+          name: row[:name],
+          image_url: row[:image_url],
+          video_url: row[:video_url],
+          description: row[:description],
+          body_part_id: row[:body_part_id],
+          sets: row[:sets],
+          reps: row[:reps],
+        }
+      end
     else
       resp[:message] = 'Usuario aún no tiene asignado ese ejercicio'
     end
