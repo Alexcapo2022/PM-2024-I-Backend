@@ -1,10 +1,7 @@
 post '/user/validate' do
   # params
   status = 500
-  resp = {
-    :message => '',
-    :data => '',
-  }
+  resp = ''
   user = params[:user]
   password = params[:password]
   # db access
@@ -18,26 +15,25 @@ post '/user/validate' do
     data = ''
     message = 'Usuario no encontrado'
     if record then
-      resp[:message] = 'Usuario encontrado'
-      resp[:data] = { 
-        user_id: record[:id], 
+      resp = { 
+        user_id: record[:id],
         member_id: record[:member_id],
-      }
+    }.to_json
       status = 200
     else
       status = 404
-      resp[:message] = 'Usuario no encontrado'
+      resp = 'Usuario no encontrado'
     end
   rescue Sequel::DatabaseError => e
-    resp[:message] = 'Error al acceder a la base de datos'
-    resp[:data] = e.message
+    resp = 'Error al acceder a la base de datos'
+    puts  = e.message
   rescue StandardError => e
-    resp[:message] = 'Ocurrió un error no esperado al validar el usuario'
-    resp[:data] = e.message
+    resp = 'Ocurrió un error no esperado al validar el usuario'
+    puts e.message
   end
   # response
   status status
-  resp.to_json
+  resp
 end
 
 post '/user/reset' do
