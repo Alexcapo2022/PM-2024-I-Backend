@@ -4,8 +4,8 @@ require 'sequel'
 set :public_folder, File.dirname(__FILE__) + '/public'
 set :views, File.dirname(__FILE__) + '/views'
 set :protection, except: :frame_options
-set :bind, '192.168.1.22'
-set :port, 4567
+set :bind, '192.168.1.108' # Cambiar por la IP de la máquina
+set :port, 4444
 # db
 require_relative 'configs/database'
 require_relative 'configs/models'
@@ -27,4 +27,5 @@ end
 get '/' do
   erb :home
 end
+
 
